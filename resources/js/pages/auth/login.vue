@@ -41,9 +41,12 @@
               <v-button :loading="form.busy">
                 {{ $t('login') }}
               </v-button>
-
+              <div class="small my-auto ml-2">
+                Or 
+                <router-link :to="{ name: 'register' }">{{ $t('create_account') }}</router-link>
+              </div>
               <!-- GitHub Login Button -->
-              <login-with-github/>
+              <!-- <login-with-github/> -->
             </div>
           </div>
         </form>
@@ -54,13 +57,13 @@
 
 <script>
 import Form from 'vform'
-import LoginWithGithub from '~/components/LoginWithGithub'
+// import LoginWithGithub from '~/components/LoginWithGithub'
 
 export default {
   middleware: 'guest',
 
   components: {
-    LoginWithGithub
+    // LoginWithGithub
   },
 
   metaInfo () {

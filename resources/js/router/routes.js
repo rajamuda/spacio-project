@@ -11,7 +11,8 @@ const SettingsProfile = () => import('~/pages/settings/profile').then(m => m.def
 const SettingsPassword = () => import('~/pages/settings/password').then(m => m.default || m)
 
 export default [
-  { path: '/', name: 'welcome', component: Welcome },
+  // { path: '/', name: 'welcome', component: Welcome },
+  { path: '', name: 'welcome', redirect: {name: 'home'} },
 
   { path: '/login', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register },
