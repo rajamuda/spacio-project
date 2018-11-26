@@ -28,7 +28,7 @@
           <!-- Authenticated -->
           <template v-if="user">
             <li class="nav-item">
-              <a href="#" class="nav-link" active-class="active">Submission</a>
+              <router-link :to="{ name: 'submission.add' }" class="nav-link" active-class="active">{{ $t('submission') }}</router-link>
             </li>
             <li class="nav-item dropdown">            
               <a class="nav-link dropdown-toggle text-dark"

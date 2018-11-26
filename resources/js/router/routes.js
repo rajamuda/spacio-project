@@ -10,6 +10,10 @@ const Settings = () => import('~/pages/settings/index').then(m => m.default || m
 const SettingsProfile = () => import('~/pages/settings/profile').then(m => m.default || m)
 const SettingsPassword = () => import('~/pages/settings/password').then(m => m.default || m)
 
+const Submission = () => import('~/pages/submission/index').then(m => m.default || m)
+const SubmissionAdd = () => import('~/pages/submission/add').then(m => m.default || m)
+const SubmissionResult = () => import('~/pages/submission/result').then(m => m.default || m)
+
 export default [
   // { path: '/', name: 'welcome', component: Welcome },
   { path: '', name: 'welcome', redirect: {name: 'home'} },
@@ -26,6 +30,13 @@ export default [
       { path: '', redirect: { name: 'settings.profile' } },
       { path: 'profile', name: 'settings.profile', component: SettingsProfile },
       { path: 'password', name: 'settings.password', component: SettingsPassword }
+    ] },
+  { path: '/submission',
+    component: Submission,
+    children: [
+      { path: '', redirect: { name: 'submission.add' } },
+      { path: 'add', name: 'submission.add', component: SubmissionAdd },
+      { path: 'result', name: 'submission.result', component: SubmissionResult }
     ] },
 
   { path: '*', component: NotFound }

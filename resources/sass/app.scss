@@ -6,3 +6,13 @@
 @import 'elements/navbar';
 @import 'elements/buttons';
 @import 'elements/transitions';
+@import 'elements/footer';
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}

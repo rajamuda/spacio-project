@@ -1,5 +1,6 @@
 <template>
-  <card :title="$t('home')">
+  <!-- <card :title="$t('home')"> -->
+  <card :class="'p-5'">
     <!-- {{ $t('welcome') }} -->
   <div class="m-auto">
 	  <div class="row">
