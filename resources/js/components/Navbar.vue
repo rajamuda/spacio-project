@@ -28,7 +28,7 @@
           <!-- Authenticated -->
           <template v-if="user">
             <li class="nav-item">
-              <router-link :to="{ name: 'submission.add' }" class="nav-link" active-class="active">{{ $t('submission') }}</router-link>
+              <router-link :to="{ name: 'submission.add' }" class="nav-link" :class="{ 'active': submissionIsActive }">{{ $t('submission') }}</router-link>
             </li>
             <li class="nav-item dropdown">            
               <a class="nav-link dropdown-toggle text-dark"
@@ -82,9 +82,19 @@ export default {
     appName: window.config.appName
   }),
 
-  computed: mapGetters({
-    user: 'auth/user'
-  }),
+  computed: {
+    ...mapGetters({
+      user: 'auth/user'
+    }),
+
+    submissionIsActive: function() {
+      let currentPath = this.$route.path;
+      if(currentPath.includes("/submission")){
+        return true
+      }
+      return false
+    }
+  },
 
   methods: {
     async logout () {

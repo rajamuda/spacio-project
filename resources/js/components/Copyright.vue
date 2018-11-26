@@ -1,7 +1,7 @@
 <template>
 	<footer class="footer">
 		<div class="container text-center">
-			<span class="text-muted">&copy; 2018 {{ appName }} &mdash; Bogor Agricultural University</span>
+			<span class="text-muted">&copy; 2018 {{ appName }} &mdash; Bioinformatic's Lab, Computer Science IPB</span>
 		</div>
 	</footer>
 </template>
