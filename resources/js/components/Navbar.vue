@@ -22,8 +22,19 @@
           <li class="nav-item">
             <a href="#" class="nav-link" active-class="active">About</a>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link" active-class="active">Explore</a>
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Explore</a>
+            <div class="dropdown-menu">
+              <a href="#" class="dropdown-item pl-3">
+                <fa icon="search" fixed-width/>
+                Browse SNPs
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item pl-3">
+                <fa icon="search" fixed-width/>
+                Browse Phenotypes
+              </a>
+            </div>
           </li>
           <!-- Authenticated -->
           <template v-if="user">
@@ -52,8 +63,8 @@
           </template>
           <!-- Guest -->
           <template v-else>
-            <li class="nav-item">
-              <router-link :to="{ name: 'login' }" class="nav-link" active-class="active">
+            <li class="nav-item" style="border: 1px solid #343a40;border-radius: 0.135rem;">
+              <router-link :to="{ name: 'login' }" class="nav-link text-dark" active-class="active">
                 {{ $t('login') }}
               </router-link>
             </li>

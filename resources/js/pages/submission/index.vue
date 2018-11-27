@@ -35,8 +35,8 @@ export default {
         },
         {
           icon: 'poll-h',
-          name: this.$t('result_submission'),
-          route: 'submission.result'
+          name: this.$t('analysis_submission'),
+          route: 'submission.analysis'
         }
       ]
     }

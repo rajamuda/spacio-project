@@ -35,5 +35,14 @@
   "welcome": "Welcome",
   "submission": "Submission",
   "add_submission": "Add New",
-  "result_submission": "Result"
+  "analysis_submission": "Analysis Result",
+  "advanced_settings": "Advanced Settings",
+  "submission_name": "Project Name",
+  "organism": "Organism Name",
+  "upload_csv": "Upload CSV Data",
+  "snp_data": "SNPs Data",
+  "phenotype_data": "Phenotype Measure",
+  "size": "Size",
+  "upload": "Upload",
+  "begin_analysis": "Begin Association Analysis"
 }
