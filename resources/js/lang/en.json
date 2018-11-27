@@ -44,5 +44,6 @@
   "phenotype_data": "Phenotype Measure",
   "size": "Size",
   "upload": "Upload",
-  "begin_analysis": "Begin Association Analysis"
+  "begin_analysis": "Begin Association Analysis",
+  "choose_file": "Choose a file"
 }

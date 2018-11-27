@@ -10,18 +10,28 @@
         <input type="text" v-model="organism" name="organism" class="col-md-8 form-control">
       </div>
       <div class="row">
-        <h5 class="col-md-12">Upload CSV Data</h5>
+        <h5 class="col-md-12">{{ $t('upload_csv') }}</h5>
       </div>
       <div class="row m-0" style="background-color: #efefef">
         <div class="form-group col-md-6">
-          <label class="col-md-12 col-form-label">{{ $t('snp_data') }}</label>
-          <input type="file" id="snps" class="col-md-12 form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'snps')">
-          <span v-if="snps.length" class="col-md-12 text-muted">{{ $t('size') }}: {{ getFileSize('snps') }} MB</span>
+          <label class="col-form-label">{{ $t('snp_data') }}</label>
+          <div class="input-upload mx-0 btn btn-upload btn-block">{{ $t('choose_file') }}
+            <input type="file" id="snps" class="form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'snps')">
+          </div>
+          <template v-if="snps.length">
+            <div class="col-md-12 text-muted">{{ snps[0].name }}</div>
+            <div class="col-md-12 text-muted">{{ $t('size') }}: {{ getFileSize('snps') }} MB</div>
+          </template>
         </div>
         <div class="form-group col-md-6">
-          <label class="col-md-12 col-form-label">{{ $t('phenotype_data') }}</label>
-          <input type="file" id="phenotype" class="col-md-12 form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'phenotype')">
-          <span v-if="phenotype.length" class="col-md-12 text-muted">{{ $t('size') }}: {{ getFileSize('phenotype') }} MB</span>
+          <label class="col-form-label">{{ $t('phenotype_data') }}</label>
+          <div class="input-upload mx-0 btn btn-upload btn-block">{{ $t('choose_file') }}
+            <input type="file" id="phenotype" class="form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'phenotype')">
+          </div> 
+          <template v-if="phenotype.length"> 
+            <div class="col-md-12 text-muted">{{ phenotype[0].name }}</div>
+            <div class="col-md-12 text-muted">{{ $t('size') }}: {{ getFileSize('phenotype') }} MB</div>
+          </template>
         </div>
         <div v-if="percentCompleted > 0" class="progress col-md-12 mb-2">
           <div class="progress-bar progress-bar-striped" :class="{'bg-success': (percentCompleted == 100), 'bg-danger': (errors != '')}" role="progressbar" :style="{width: percentCompleted + '%'}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> {{ percentCompleted }}% </div>
@@ -166,3 +176,22 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+.input-upload {
+  position: relative;
+  overflow: hidden;
+  margin: 10px;
+}
+</style>

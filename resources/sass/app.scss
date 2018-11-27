@@ -16,3 +16,13 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.btn-upload {
+	color: #fff;
+  background-color: $nav-pills-link-active-bg;
+}
+
+.btn-upload:hover {
+	color: #fff;
+  background-color: darken($nav-pills-link-active-bg, 15%);
+}
