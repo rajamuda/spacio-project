@@ -130,8 +130,13 @@ export default {
       var file = e.target.files || e.dataTransfer.files
       if (!file.length) return
 
-      if(type === 'snps') this.snps.push(file[0])
-      else if(type === 'phenotype') this.phenotype.push(file[0])
+      if(type === 'snps') { 
+        this.snps = []
+        this.snps.push(file[0])
+      } else if(type === 'phenotype')  {
+        this.phenotype = []
+        this.phenotype.push(file[0])
+      }
       else return
     },
 
