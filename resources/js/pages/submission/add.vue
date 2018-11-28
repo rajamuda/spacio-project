@@ -15,7 +15,9 @@
       <div class="row m-0" style="background-color: #efefef">
         <div class="form-group col-md-6">
           <label class="col-form-label">{{ $t('snp_data') }}</label>
-          <div class="input-upload mx-0 btn btn-upload btn-block">{{ $t('choose_file') }}
+          <div class="input-upload mx-0 btn btn-upload btn-block">
+            <fa icon="folder-open" fixed-width/>
+            {{ $t('choose_file') }}
             <input type="file" id="snps" class="form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'snps')">
           </div>
           <template v-if="snps.length">
@@ -25,7 +27,9 @@
         </div>
         <div class="form-group col-md-6">
           <label class="col-form-label">{{ $t('phenotype_data') }}</label>
-          <div class="input-upload mx-0 btn btn-upload btn-block">{{ $t('choose_file') }}
+          <div class="input-upload mx-0 btn btn-upload btn-block">
+            <fa icon="folder-open" fixed-width/>
+            {{ $t('choose_file') }}
             <input type="file" id="phenotype" class="form-control-file" accept="text/csv" @change="uploadFieldChange($event, 'phenotype')">
           </div> 
           <template v-if="phenotype.length"> 
@@ -69,8 +73,8 @@
         </div>
       </div>
       <div class="form-group pt-4 px-0 col-md-12">
-        <button class="btn btn-success" :disabled="isUpload" @click="submit">{{ $t('upload') }}</button>
-        <button class="btn" :class="{'btn-secondary': (percentCompleted < 100), 'btn-primary': (percentCompleted == 100)}" :disabled="percentCompleted < 100">{{ $t('begin_analysis') }}</button>
+        <button class="btn btn-success" :disabled="isUpload" @click="submit"><fa icon="upload" fixed-width/> {{ $t('upload') }}</button>
+        <button class="btn" :class="{'btn-secondary': (percentCompleted < 100), 'btn-primary': (percentCompleted == 100)}" :disabled="percentCompleted < 100"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
       </div>   
     </div>
   </card>
