@@ -411,9 +411,17 @@ select <- function(x, y, n.tree = 500,
 # opt_parser = OptionParser(option_list=option_list);
 # opt = parse_args(opt_parser);
 
-R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
+if(.Platform$OS.type == "windows"){
+  R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
+  setwd("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data"); #windows
+}else if(.Platform$OS.type == "unix"){
+  R.lib.loc <- "/home/user/R/lib/3.3"
+  setwd("/home/user/htdocs/spacio-project/resources/data") 
+}else{
+  stop(message("Error: Unknown OS Type!"))
+}
+
 cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tPreparing data\n")
-setwd("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data"); #windows
 snps <- read.csv('snps_data.csv', header = FALSE, sep = ",")
 phenotype <- read.csv('pheno_data.csv', header = FALSE, sep = ",")
 
