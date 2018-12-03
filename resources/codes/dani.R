@@ -20,7 +20,7 @@ toNA <- function(data, missing.symbol,
 # Missing call filter
 mc.filter <- function(genotype, col.mcr, row.mcr){
   if(col.mcr < 0 | row.mcr < 0 | 1 < col.mcr | 1 < row.mcr)
-    stop(message("Missing call rate must be [0, 1]!"))
+    stop(message("\n[x] Error: Missing call rate must be [0, 1]!"))
   
   geno.dim <- dim(genotype)
   removed.cols <- vector("numeric")
@@ -95,7 +95,7 @@ sbe.svr <- function(x, y, var.index = 1:ncol(x),
   if(!is.vector(var.index)) var.index <- as.vector(var.index)
   if(is.list(var.index)) var.index <- unlist(var.index)
   if(n.count < 1)
-    stop(message("Number of elimination step must at least be 1!"))
+    stop(message("\n[x] Error: Number of elimination step must at least be 1!"))
   n.var <- ncol(x)
   criterion <- match.arg(criterion)
   fit <- NA
@@ -129,21 +129,27 @@ sbe.svr <- function(x, y, var.index = 1:ncol(x),
     if(length(removed.index) != 0)
       var.index <- var.index[-removed.index]
     selected.var <- colnames(x)[var.index]
+    
+    if(debug.mode) cat("------------------------------------------------------------\n")
     if(!setequal(selected.var, prev.selected.var)){
-      cat("Backward Elimination:",
+      if(debug.mode) {
+        cat("Backward Elimination:",
           setdiff(prev.selected.var, selected.var),
           "removed!", "\n")
-      cat(selected.var, "\n")
+        cat(selected.var, "\n")
+      }
       if(criterion == "mse"){
         mse <- min(fit, na.rm = TRUE)
-        cat("Mean squared error:", mse, "\n")
+        if(debug.mode) cat("Mean squared error:", mse, "\n")
       }
       else if(criterion == "adjR2"){
         adjR2 <- max(fit, na.rm = TRUE)
-        cat("Adjusted R squared:", adjR2, "\n")
+        if(debug.mode) cat("Adjusted R squared:", adjR2, "\n")
       }
     }
-    else cat("Backward Elimination: None removed!\n")
+    else {
+      if(debug.mode) cat("Backward Elimination: None removed!\n")
+    }
     count <- count + 1
   }
   return(list(adjR2 = adjR2, mse = mse,
@@ -161,7 +167,7 @@ sfs.svr <- function(x, y, var.index = NULL,
   if(!is.vector(var.index)) var.index <- as.vector(var.index)
   if(is.list(var.index)) var.index <- unlist(var.index)
   if(n.count < 1)
-    stop(message("Number of selection step must at least be 1!"))
+    stop(message("\n[x] Error: Number of selection step must at least be 1!"))
   n.var <- ncol(x)
   criterion <- match.arg(criterion)
   fit <- NA
@@ -197,20 +203,25 @@ sfs.svr <- function(x, y, var.index = NULL,
         c(var.index, which.max(fit))
     }
     selected.var <- colnames(x)[var.index]
+    if(debug.mode) cat("------------------------------------------------------------\n")
     if(!any(duplicated(selected.var))){
-      cat("Forward Selection:", tail(selected.var, 1L),
+      if(debug.mode) {
+        cat("Forward Selection:", tail(selected.var, 1L),
           "added!", "\n")
-      cat(selected.var, "\n")
+        cat(selected.var, "\n")
+      }
       if(criterion == "mse"){
         mse <- min(fit, na.rm = TRUE)
-        cat("Mean squared error:", mse, "\n")
+        if(debug.mode) cat("Mean squared error:", mse, "\n")
       }
       else if(criterion == "adjR2"){
         adjR2 <- max(fit, na.rm = TRUE)
-        cat("Adjusted R squared:", adjR2, "\n")
+        if(debug.mode) cat("Adjusted R squared:", adjR2, "\n")
       }
     }
-    else cat("Forward Selection: None added!\n")
+    else {
+      if(debug.mode) cat("Forward Selection: None added!\n")
+    }
     count <- count + 1
   }
   return(list(adjR2 = adjR2, mse = mse,
@@ -264,33 +275,33 @@ select <- function(x, y, n.tree = 500,
   if(!is.vector(y)) y <- as.vector(y)
   n.var <- ncol(x)
   if(n.searched.var < 1 | n.searched.var > n.var)
-    stop(message("Top n most important variables to be searched"),
+    stop(message("\n[x] Error: Top n most important variables to be searched"),
          message("must at least be 1 and at most be ",
                  n.var, "!"))
   if(n.most.imp < 1 | n.most.imp > n.searched.var)
-    stop(message("Initial n variables to be searched"),
+    stop(message("\n[x] Error: Initial n variables to be searched"),
          message("must at least be 1 and at most be ",
                  n.searched.var, "!"))
   set.mtry <- match.arg(set.mtry)
   if(set.mtry == "default"){
     mtry <- max(floor(n.var/3), 1)
-    cat("Using default value of 'mtry' =", mtry, "\n")
+    cat("> Using default value of 'mtry' =", mtry, "\n")
   }
   else if(set.mtry == "tuned"){
-    cat("Tuning random forest parameter 'mtry'. Please wait...\n")
+    cat("> Tuning random forest parameter 'mtry'. Please wait...\n")
     mtry <- randomForest::tuneRF(x, y, doBest = TRUE)$mtry
-    cat("Best 'mtry' =", mtry, "\n")
+    cat("> Best 'mtry' =", mtry, "\n")
   }
   else if(set.mtry == "complete"){
     mtry <- n.var
-    cat("Using 'mtry' =", mtry, "\n")
+    cat("> Using 'mtry' =", mtry, "\n")
   }
   suppressWarnings(require(foreach, quietly = TRUE, lib.loc = R.lib.loc))
   n.core <- parallel::detectCores()
   doParallel::registerDoParallel(cores = n.core)
   n.core <- getDoParWorkers()
   ntree <- vector("integer", 1L)
-  cat("Growing", n.tree, "random decision trees using",
+  cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tGrowing", n.tree, "random decision trees using",
       n.core, "core(s)! Please wait...\n")
   RF <- foreach(ntree = rep(round(n.tree/n.core), n.core),
                 .combine = randomForest::combine,
@@ -306,13 +317,18 @@ select <- function(x, y, n.tree = 500,
   }
   RF.VIM <- sort(randomForest::importance(RF)[,vim.type],
                  decreasing = TRUE)
-  cat(n.tree, "trees are grown and variable ranking by",
+  cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), paste0("\t", n.tree), "trees are grown and variable ranking by",
       "random forest is done!\n")
   X <- x[,names(RF.VIM)[1:n.searched.var]]
+  
+  cat(paste0("############################################################\n",
+      format(Sys.time(), "%Y-%m-%d %H:%M:%S")), "\tBegin SNPs association selection process\n")
   doParallel::registerDoParallel(cores = n.core)
+  cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tSelection using MSE criterion...\n")
   SFFS1 <- sffs.svr(X[,1:n.most.imp], y, criterion = "mse",
                     kernel = kernel, kpar = kpar,
                     scaled = scaled, cost = cost, cv = cv)
+  cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tSelection using Adjusted R Square criterion...\n")
   SFFS2 <- sffs.svr(X[,1:n.most.imp], y, criterion = "adjR2",
                     kernel = kernel, kpar = kpar,
                     scaled = scaled, cost = cost, cv = cv)
@@ -321,7 +337,7 @@ select <- function(x, y, n.tree = 500,
   first.selected.index <- intersect(SFFS1$var.index,
                                     SFFS2$var.index)
   if(length(first.selected.index) == 0)
-    stop(message("Selection failure!"))
+    stop(message("\n[x] Error: Selection failure!"))
   first.mse <- fitness(X[,first.selected.index], y,
                        criterion = "mse",
                        kernel = kernel, kpar = kpar,
@@ -376,22 +392,25 @@ select <- function(x, y, n.tree = 500,
       as.vector(final.selected[2,][gtools::mixedorder(final.selected[1,])])
   }
   closeAllConnections()
-  cat("\n", "Results:\n", sep = "")
-  result <- print(data.frame(rbind(final.selected.var,
-                                   final.selected.index),
-                             row.names = c("Selected variables",
-                                           "Rank (random forest)"),
-                             fix.empty.names = FALSE))
-  optimum <- print(data.frame(rbind(final.adjR2, final.mse),
-                              row.names = c("Adjusted R squared:",
-                                            "Mean squared error:"),
-                              fix.empty.names = FALSE))
+  cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "SNPs selection has been completed\n\n")
+  # cat("\n", "Results:\n", sep = "")
+  # result <- print(data.frame(rbind(final.selected.var,
+  #                                  final.selected.index),
+  #                            row.names = c("Selected variables",
+  #                                          "Rank (random forest)"),
+  #                            fix.empty.names = FALSE))
+  # optimum <- print(data.frame(rbind(final.adjR2, final.mse),
+  #                             row.names = c("Adjusted R squared:",
+  #                                           "Mean squared error:"),
+  #                             fix.empty.names = FALSE))
   end <- Sys.time()
   time.taken <- print(end - start)
   return(list(final.selected.var = final.selected.var,
               final.selected.index = final.selected.index,
               first.selected.var = first.selected.var,
               first.selected.index = first.selected.index,
+              final.adjr2 = final.adjr2,
+              final.mse = final.mse,
               optimum = optimum, result = result, sorted.X = X,
               time.taken = time.taken))
 }
@@ -415,11 +434,13 @@ if(.Platform$OS.type == "windows"){
   R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
   setwd("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data"); #windows
 }else if(.Platform$OS.type == "unix"){
-  R.lib.loc <- "/home/user/R/lib/3.3"
-  setwd("/home/user/htdocs/spacio-project/resources/data") 
+  R.lib.loc <- "/home/biofarmaka/R/x86_64-pc-linux-gnu-library/3.4"
+  setwd("/home/biofarmaka/spacio-codes/data") 
 }else{
-  stop(message("Error: Unknown OS Type!"))
+  stop(message("\n[x] Error: Unknown OS Type!"))
 }
+
+debug.mode <- FALSE
 
 cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tPreparing data\n")
 snps <- read.csv('snps_data.csv', header = FALSE, sep = ",")
@@ -489,15 +510,18 @@ cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tImputing missing genotype 
 data.geno <- scrime::knncatimpute(data.geno, "cohen", nn = 120)
 
 # Summary
-cat("##### Preprocessing Summary #####\n")
+cat("> Preprocessing Summary")
 cat("*] Size of genotype matrix before pre-processing:", ori.size, "\n")
 cat("*] Size of genotype matrix after call rate filter:", mcr.size, "\n")
 cat("*] Size of genotype matrix after monomorphic filter:", poly.size, "\n")
 cat("*] Size of genotype matrix after MAF filter:", maf.size, "\n")
-cat("############################################################")
+cat("############################################################\n")
 
 # Start the process
-suppressWarnings(library("kernlab", lib.loc = R.lib.loc))
-suppressWarnings(library("randomForest", lib.loc = R.lib.loc))
-suppressWarnings(library("gtools", lib.loc = R.lib.loc))
-suppressWarnings(library("doParallel", lib.loc = R.lib.loc))
+selection.result <- select(data.geno, as.numeric(data.pheno), set.mtry = "complete")
+
+# write result into CSV and JSON files
+df <- data.frame(cbind(selection.result$final.selected.var, selection.result$final.selected.index))
+write.csv(df, file="result.csv", row.names = FALSE)
+write(paste0("{\"adjr2\": \"", selection.result$final.adjr2, "\", \"mse\": \"", selection.result$final.mse, "\"}")
+      , file="metrics.json")
