@@ -21,7 +21,7 @@ class CreatePhenotypesTable extends Migration
 
             $table->foreign('data_id')
                 ->references('id')
-                ->on('uploads')
+                ->on('files')
                 ->onDelete('cascade');
         });
     }

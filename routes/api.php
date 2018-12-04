@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use Hashids\Hashids; // <- using PHP BC Math extension
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,4 +36,15 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     Route::post('oauth/{driver}', 'Auth\OAuthController@redirectToProvider');
     Route::get('oauth/{driver}/callback', 'Auth\OAuthController@handleProviderCallback')->name('oauth.callback');
+
+    Route::get('test/hashid', function (Request $request) {
+        $id = $request->query('id');
+
+        $hashid = new Hashids('s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $enc = $hashid->encode($id);
+        $dec = $hashid->decode($enc);
+
+        echo $enc."<br/>\n";
+        echo $dec[0]."\n";
+    });
 });

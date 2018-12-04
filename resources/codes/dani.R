@@ -392,7 +392,7 @@ select <- function(x, y, n.tree = 500,
       as.vector(final.selected[2,][gtools::mixedorder(final.selected[1,])])
   }
   closeAllConnections()
-  cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "SNPs selection has been completed\n\n")
+  cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tSNPs selection has been completed\n\n")
   # cat("\n", "Results:\n", sep = "")
   # result <- print(data.frame(rbind(final.selected.var,
   #                                  final.selected.index),
@@ -409,9 +409,8 @@ select <- function(x, y, n.tree = 500,
               final.selected.index = final.selected.index,
               first.selected.var = first.selected.var,
               first.selected.index = first.selected.index,
-              final.adjr2 = final.adjr2,
-              final.mse = final.mse,
-              optimum = optimum, result = result, sorted.X = X,
+              final.adjR2 = final.adjR2,
+              final.mse = final.mse, sorted.X = X,
               time.taken = time.taken))
 }
 ##################################################################
@@ -510,7 +509,7 @@ cat("--", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tImputing missing genotype 
 data.geno <- scrime::knncatimpute(data.geno, "cohen", nn = 120)
 
 # Summary
-cat("> Preprocessing Summary")
+cat("> Preprocessing Summary\n")
 cat("*] Size of genotype matrix before pre-processing:", ori.size, "\n")
 cat("*] Size of genotype matrix after call rate filter:", mcr.size, "\n")
 cat("*] Size of genotype matrix after monomorphic filter:", poly.size, "\n")
@@ -522,6 +521,7 @@ selection.result <- select(data.geno, as.numeric(data.pheno), set.mtry = "comple
 
 # write result into CSV and JSON files
 df <- data.frame(cbind(selection.result$final.selected.var, selection.result$final.selected.index))
+colnames(df) <- c("selected", "rank")
 write.csv(df, file="result.csv", row.names = FALSE)
-write(paste0("{\"adjr2\": \"", selection.result$final.adjr2, "\", \"mse\": \"", selection.result$final.mse, "\"}")
+write(paste0("{\"adjR2\": \"", selection.result$final.adjR2, "\", \"mse\": \"", selection.result$final.mse, "\"}")
       , file="metrics.json")
