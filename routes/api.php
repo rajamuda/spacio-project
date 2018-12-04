@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Hashids\Hashids; // <- using PHP BC Math extension
+use Illuminate\Support\Facades\Auth;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +27,12 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('test/upload', function (Request $request) {
         dd($request);
+    });
+
+    Route::group(['middleware' => 'active.account:api'], function () {
+        Route::get('test/account', function (Request $request) {
+            echo "SAFE!";
+        });
     });
 });
 

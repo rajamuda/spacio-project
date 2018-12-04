@@ -15,6 +15,7 @@ class CreateFilesTable extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('hashid')->unique();
             $table->integer('user_id')->unsigned();
             $table->string('project_name');
             $table->string('organism');
@@ -29,7 +30,7 @@ class CreateFilesTable extends Migration
                 ->on('users')
                 ->onDelete('cascade');
 
-            $table->foreign('status_id(a)')
+            $table->foreign('status_id')
                 ->references('id')
                 ->on('process_status')
                 ->onDelete('cascade');

@@ -16,19 +16,23 @@ class ProcessStatusSeeder extends Seeder
     	DB::table('process_status')->insert([
     		[
     			'name' => 'Uploaded',
-    			'description' => 'Files required have been succesfully uploaded to server and can be used for association analysis'
+    			'description' => 'Files required have been succesfully uploaded to server and can be used for association analysis',
+                'created_at' => date('Y-m-d H:i:s')
     		],
     		[
     			'name' => 'Analysing',
-    			'description' => 'Running SNP-phenotype association analysis process'
+    			'description' => 'Running SNP-phenotype association analysis process',
+                'created_at' => date('Y-m-d H:i:s')
     		],
     		[
     			'name' => 'Finished',
-    			'description' => 'Association process has been completed'
+    			'description' => 'Association process has been completed',
+                'created_at' => date('Y-m-d H:i:s')
     		],
     		[
     			'name' => 'Failed',
-    			'description' => 'An error occured or there is something wrong in the process'
+    			'description' => 'An error occured or there is something wrong in the process',
+                'created_at' => date('Y-m-d H:i:s')
     		]
     	]);
     }

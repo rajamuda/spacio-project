@@ -87,6 +87,8 @@ import axios from 'axios'
 export default {
   scrollToTop: false,
 
+  middleware: 'active-account',
+
   metaInfo () {
     return { title: this.$t('submission') }
   },

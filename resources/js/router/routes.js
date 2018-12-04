@@ -13,6 +13,7 @@ const SettingsPassword = () => import('~/pages/settings/password').then(m => m.d
 const Submission = () => import('~/pages/submission/index').then(m => m.default || m)
 const SubmissionAdd = () => import('~/pages/submission/add').then(m => m.default || m)
 const SubmissionAnalysis = () => import('~/pages/submission/analysis').then(m => m.default || m)
+const SubmissionRestricted = () => import('~/pages/submission/restricted').then(m => m.default || m)
 
 export default [
   // { path: '/', name: 'welcome', component: Welcome },
@@ -36,7 +37,8 @@ export default [
     children: [
       { path: '', redirect: { name: 'submission.add' } },
       { path: 'add', name: 'submission.add', component: SubmissionAdd },
-      { path: 'analysis', name: 'submission.analysis', component: SubmissionAnalysis }
+      { path: 'analysis', name: 'submission.analysis', component: SubmissionAnalysis },
+      { path: 'oopsie', name: 'submission.restricted', component: SubmissionRestricted }
     ] },
 
   { path: '*', component: NotFound }
