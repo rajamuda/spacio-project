@@ -55,10 +55,12 @@ Route::group(['middleware' => 'guest:api'], function () {
 
         // echo $enc."<br/>\n";
         // echo $dec[0]."\n";
-        $file = "/home/surado/htdocs/spacio-project/resources/data/result.csv";
-        $csv= file_get_contents($file);
-        $array = array_map("str_getcsv", explode("\n", $csv));
-        $json = json_encode($array);
-        print_r($array);
+        // $file = "/home/surado/htdocs/spacio-project/resources/data/result.csv";
+        // $csv= file_get_contents($file);
+        // $array = array_map("str_getcsv", explode("\n", $csv));
+        // $json = json_encode($array);
+        // print_r($array);
+        $a = "Xy2nasj2";
+        echo base_path('resources/data/'.$a);
     });
 });

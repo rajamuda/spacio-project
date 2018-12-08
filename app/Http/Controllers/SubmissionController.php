@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\File;
-use Hashids\Hashids
+use Hashids\Hashids;
 use Illuminate\Support\Facades\DB;
 
 class SubmissionController extends Controller
@@ -36,10 +36,11 @@ class SubmissionController extends Controller
     		'phenotype' => 'required|mimes:csv,txt'
     	]);
 
-    	$snps = $this->fileNameFilter($request->file('snps')->getClientOriginalName());
-    	$phenotype = $this->fileNameFilter($request->file('phenotype')->getClientOriginalName());
+    	$snps = $request->file('snps');
+    	$phenotype = $request->file('phenotype');
 
-    	echo $snps."<br/>".$phenotype;
+    	$snps_file = "snps_".$this->fileNameFilter($snps->getClientOriginalName());
+    	$phenotype_file = "pheno_".$this->fileNameFilter($phenotype->getClientOriginalName());
 
 
     	DB::beginTransaction();
@@ -50,23 +51,36 @@ class SubmissionController extends Controller
 		    			'status_id' => 1,
 		    			'project_name' => $request->project_name,
 		    			'organism' => $request->organism,
-		    			'snps_data' => $snps,
-		    			'phenotype_data' => $phenotype,
+		    			'snps_data' => $snps_file,
+		    			'phenotype_data' => $phenotype_file,
 		    			'configuration' => "default",
 		    			'created_at' => date('Y-m-d H:i:s')
 		    		]);
 
     		$hashid = new Hashids('f1l3-s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
+    		$dir = $hashid->encode($file_id);
+    		$path = base_path('resources/data/'.$dir);
+    		if (mkdir($path))
+    		{
+	    		$snps->move($path, $snps_file);
+	    		$phenotype->move($path, $phenotype_file);
+	    	}
+	    	else 
+	    	{
+	    		throw new \Exception('Directory creation failed!');
+	    	}
 
-    		File::update([
-    			'hashid' => $hashid->encode($file_id)
-    		])->where('id', $file_id);
+    		File::where('id', $file_id)->update([
+    			'hashid' => $dir
+    		]);
 
     		DB::commit();
+    		return ['status' => true, 'message' => 'Success uploading data'];
     	}
     	catch (\Exception $e)
     	{
     		DB::rollback();
+    		return ['status' => false, 'message' => $e->getMessage()];
     	}
     }
 }
