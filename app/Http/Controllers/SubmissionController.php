@@ -46,19 +46,21 @@ class SubmissionController extends Controller
     	DB::beginTransaction();
     	try
     	{
-    		$file_id = File::insert([
-		    			'user_id' => $request->user()->id,
-		    			'status_id' => 1,
-		    			'project_name' => $request->project_name,
-		    			'organism' => $request->organism,
-		    			'snps_data' => $snps_file,
-		    			'phenotype_data' => $phenotype_file,
-		    			'configuration' => "default",
-		    			'created_at' => date('Y-m-d H:i:s')
-		    		]);
+			// Insert data
+			$file = new File();
+			$file->user_id = $request->user()->id;
+			$file->status_id = 1;
+			$file->project_name = $request->project_name;
+			$file->organism = $request->organism;
+			$file->snps_data = $snps_file;
+			$file->phenotype_data = $phenotype_file;
+			$file->configuration = "default";
+			$file->created_at = date('Y-m-d H:i:s');
+			$file->save();
 
+			// Generate HashID and create new directory path
     		$hashid = new Hashids('f1l3-s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
-    		$dir = $hashid->encode($file_id);
+    		$dir = $hashid->encode($file->id);
     		$path = base_path('resources/data/'.$dir);
     		if (mkdir($path))
     		{
@@ -70,7 +72,8 @@ class SubmissionController extends Controller
 	    		throw new \Exception('Directory creation failed!');
 	    	}
 
-    		File::where('id', $file_id)->update([
+			// Update hashid field in file's table
+    		File::where('id', $file->id)->update([
     			'hashid' => $dir
     		]);
 

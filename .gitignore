@@ -14,3 +14,10 @@ yarn-error.log
 /public/css
 /public/mix-manifest.json
 phpunit.dusk.xml
+/resources/data/*
+!/resources/data/*.csv
+!/resources/data/*.txt
+!/resources/data/*.json
+
+
+
