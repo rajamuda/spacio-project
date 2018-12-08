@@ -3,7 +3,7 @@
     <div class="m-auto p-4">
       <div class="form-group row">
         <label class="col-md-3 col-form-label">{{ $t('submission_name') }}</label>
-        <input type="text" v-model="projectName" name="projectName" class="col-md-8 form-control">
+        <input type="text" v-model="project_name" name="project_name" class="col-md-8 form-control">
       </div>
       <div class="form-group row">
         <label class="col-md-3 col-form-label">{{ $t('organism') }}</label>
@@ -37,8 +37,8 @@
             <div class="col-md-12 text-muted">{{ $t('size') }}: {{ getFileSize('phenotype') }} MB</div>
           </template>
         </div>
-        <div v-if="percentCompleted > 0" class="progress col-md-12 mb-2">
-          <div class="progress-bar progress-bar-striped" :class="{'bg-success': (percentCompleted == 100), 'bg-danger': (errors != '')}" role="progressbar" :style="{width: percentCompleted + '%'}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> {{ percentCompleted }}% </div>
+        <div v-if="percent_completed > 0" class="progress col-md-12 mb-2">
+          <div class="progress-bar progress-bar-striped" :class="{'bg-success': (percent_completed == 100), 'bg-danger': (errors != '')}" role="progressbar" :style="{width: percent_completed + '%'}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> {{ percent_completed }}% </div>
         </div>   
       </div>
       <!-- Parameter settings -->
@@ -73,8 +73,8 @@
         </div>
       </div>
       <div class="form-group pt-4 px-0 col-md-12">
-        <button class="btn btn-success" :disabled="isUpload" @click="submit"><fa icon="upload" fixed-width/> {{ $t('upload') }}</button>
-        <button class="btn" :class="{'btn-secondary': (percentCompleted < 100), 'btn-primary': (percentCompleted == 100)}" :disabled="percentCompleted < 100"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
+        <button class="btn btn-success" :disabled="uploaded" @click="submit"><fa icon="upload" fixed-width/> {{ $t('upload') }}</button>
+        <button class="btn" :class="{'btn-secondary': (percent_completed < 100), 'btn-primary': (percent_completed == 100)}" :disabled="percent_completed < 100"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
       </div>   
     </div>
   </card>
@@ -96,12 +96,12 @@ export default {
   data: () => ({
     snps: [],
     phenotype: [],
-    projectName: '',
+    project_name: '',
     organism: '',
-    formData: new FormData(),
+    form_data: new FormData(),
     errors: '',
-    percentCompleted: 0,
-    isUpload: false
+    percent_completed: 0,
+    uploaded: false
   }),
 
   computed: mapGetters({
@@ -120,11 +120,11 @@ export default {
     },
 
     prepareFields() {
-      if(this.snps.length && this.phenotype.length && this.projectName && this.organism){
-        this.formData.append('file[0]', this.snps[0])
-        this.formData.append('file[1]', this.phenotype[0])
-        this.formData.append('projectName', this.projectName)
-        this.formData.append('organism', this.organism)
+      if(this.snps.length && this.phenotype.length && this.project_name && this.organism){
+        this.form_data.append('snps', this.snps[0])
+        this.form_data.append('phenotype', this.phenotype[0])
+        this.form_data.append('project_name', this.project_name)
+        this.form_data.append('organism', this.organism)
         return true
       }
 
@@ -147,30 +147,25 @@ export default {
     },
 
     submit() {
-      if(this.prepareFields() && !this.isUpload){
+      if(this.prepareFields() && !this.uploaded){
         this.errors = ''
-        this.isUpload = true
+        this.uploaded = true
 
         var config = {
           headers: { 'Content-Type': 'multipart/form-data' } ,
           onUploadProgress: function(progressEvent) {
-            this.percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            this.percent_completed = Math.round((progressEvent.loaded * 100) / progressEvent.total)
             this.$forceUpdate()
           }.bind(this)
         };
         // // Make HTTP request to store announcement
-        axios.post('/api/test/upload', this.formData, config)
-          .then(function (response) {
-            console.log(response)
-            // if (response.data.success) {
-            //   console.log('Successfull Upload')
-            //   this.resetData()
-            // } else {
-            //   console.log('Unsuccessful Upload')
-            //   this.errors = response.data.errors
-            // }
-          }).catch(function (error) {
-            console.error(error)
+        axios.post('/api/submission/upload', this.form_data, config)
+          .then(({data}) => {
+            console.log(data)
+          }).catch((e) => {
+            this.uploaded = false
+            this.percent_completed = 0;
+            console.error(e)
           });
       } else {
         this.errors = "Specified field or file not inputed yet"
@@ -180,7 +175,7 @@ export default {
     // We want to clear the FormData object on every upload so we can re-calculate new files again.
     // Keep in mind that we can delete files as well so in the future we will need to keep track of that as well
     resetData() {
-      this.formData = new FormData() // Reset it completely
+      this.form_data = new FormData() // Reset it completely
       this.snps = []
       this.phenotype = []
     },

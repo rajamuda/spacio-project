@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Hashids\Hashids; // <- using PHP BC Math extension
-use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +32,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('test/account', function (Request $request) {
             echo "SAFE!";
         });
+
+        Route::post('submission/upload', 'SubmissionController@upload');
     });
 });
 
@@ -46,13 +47,18 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('oauth/{driver}/callback', 'Auth\OAuthController@handleProviderCallback')->name('oauth.callback');
 
     Route::get('test/hashid', function (Request $request) {
-        $id = $request->query('id');
+        // $id = $request->query('id');
 
-        $hashid = new Hashids('s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
-        $enc = $hashid->encode($id);
-        $dec = $hashid->decode($enc);
+        // $hashid = new Hashids('s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
+        // $enc = $hashid->encode($id);
+        // $dec = $hashid->decode($enc);
 
-        echo $enc."<br/>\n";
-        echo $dec[0]."\n";
+        // echo $enc."<br/>\n";
+        // echo $dec[0]."\n";
+        $file = "/home/surado/htdocs/spacio-project/resources/data/result.csv";
+        $csv= file_get_contents($file);
+        $array = array_map("str_getcsv", explode("\n", $csv));
+        $json = json_encode($array);
+        print_r($array);
     });
 });
