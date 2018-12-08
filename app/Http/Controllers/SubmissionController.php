@@ -20,14 +20,38 @@ class SubmissionController extends Controller
     	return $file_name;
     }
 
+    private static function hashId ($id, $type)
+    {
+		$hashid = new Hashids(
+					config('app.hashid.secret'), 
+					config('app.hashid.padding'), 
+					config('app.hashid.characters')
+				);
+
+		if($type === "encode")
+			return $hashid->encode($id);
+		else if($type === "decode")
+			return $hashid->decode($id);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+	| Router specific function
+    |--------------------------------------------------------------------------
+	| upload: handling /submission/add form
+	| getAll: get all submission data
+	| runAnalysis: run the association analysis process in the background
+	|
+	|
+    */
     public function upload (Request $request)
     {
     	/* 	SECURITY CONCERN:
     		Severity: Mid to High
 
-    		Problem: file's mime validation currently allowing type csv alongside with txt, but it can allowing user for uploading malicious text file contain 'evil' script.
+    		Problem: file's mime validation currently allowing csv alongside with txt, but it can allowing user to uploading malicious text file contain 'evil' script.
 
-    		Solution: uploaded files must be validated internally
+    		Solution: uploaded files must be validated internally. Check wether each files trully csv-formatted.
 		*/
     	$this->validate($request, [
     		'project_name' => 'required',
@@ -59,9 +83,8 @@ class SubmissionController extends Controller
 			$file->save();
 
 			// Generate HashID and create new directory path
-    		$hashid = new Hashids('f1l3-s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
-    		$dir = $hashid->encode($file->id);
-    		$path = base_path('resources/data/'.$dir);
+    		$hashid = $this->hashId($file->id, "encode");
+    		$path = base_path('resources/data/'.$hashid);
     		if (mkdir($path))
     		{
 	    		$snps->move($path, $snps_file);
@@ -74,7 +97,7 @@ class SubmissionController extends Controller
 
 			// Update hashid field in file's table
     		File::where('id', $file->id)->update([
-    			'hashid' => $dir
+    			'hashid' => $hashid
     		]);
 
     		DB::commit();

@@ -217,4 +217,20 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | HashID Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Store information about hashids secret key, padding, and allowed
+    | characters.
+    | 
+    */
+
+    'hashid' => [
+        'secret' => env('HASHID_KEY'),
+        'padding' => '10',
+        'characters' => 'abcdefghijklmnopqrstuvwxyz0123456789',
+    ],
+
 ];

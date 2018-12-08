@@ -47,11 +47,16 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('oauth/{driver}/callback', 'Auth\OAuthController@handleProviderCallback')->name('oauth.callback');
 
     Route::get('test/hashid', function (Request $request) {
-        // $id = $request->query('id');
+        $id = $request->query('id');
 
-        // $hashid = new Hashids('s3cr3t', '10', 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $hashid = new Hashids(
+                    config('app.hashid.secret'), 
+                    config('app.hashid.padding'), 
+                    config('app.hashid.characters')
+                );
         // $enc = $hashid->encode($id);
-        // $dec = $hashid->decode($enc);
+        $dec = $hashid->decode($id);
+        print_r($dec);
 
         // echo $enc."<br/>\n";
         // echo $dec[0]."\n";
@@ -60,7 +65,7 @@ Route::group(['middleware' => 'guest:api'], function () {
         // $array = array_map("str_getcsv", explode("\n", $csv));
         // $json = json_encode($array);
         // print_r($array);
-        $a = "Xy2nasj2";
-        echo base_path('resources/data/'.$a);
+        // $a = "Xy2nasj2";
+        // echo base_path('resources/data/'.$a);
     });
 });
