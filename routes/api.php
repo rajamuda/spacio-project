@@ -24,16 +24,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
 
-    Route::post('test/upload', function (Request $request) {
-        dd($request);
-    });
-
     Route::group(['middleware' => 'active.account:api'], function () {
-        Route::get('test/account', function (Request $request) {
-            echo "SAFE!";
-        });
-
+        Route::get('submission/get/{hash_id}', 'SubmissionController@getOne');
+        Route::get('submission/get-all', 'SubmissionController@getAll');
         Route::post('submission/upload', 'SubmissionController@upload');
+        Route::post('submission/run-analysis', 'SubmissionController@runAnalysis');
     });
 });
 

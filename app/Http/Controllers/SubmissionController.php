@@ -38,12 +38,68 @@ class SubmissionController extends Controller
     |--------------------------------------------------------------------------
 	| Router specific function
     |--------------------------------------------------------------------------
-	| upload: handling /submission/add form
-	| getAll: get all submission data
-	| runAnalysis: run the association analysis process in the background
+	| GET getOne: get one submission
+	| GET getAll: get all submission data
+	| POST upload: handling /submission/add form
+	| POST runAnalysis: run the association analysis process in the background
+	| POST stopAnalysis: stop association analysis process (TO DO)
 	|
-	|
-    */
+	*/
+	public function getOne (Request $request)
+	{
+		$user_id = $request->user()->id;
+		$id = $this->hashId($request->hash_id, "decode");
+		
+		if($id){
+			$file = File::where([
+						['user_id', '=', $user_id],
+						['id', '=', $id[0]]
+					])->first();
+			
+			return $file;
+		}
+
+		// TO DO
+		// Read log.txt, error.txt, result.csv, and metrics.json
+
+		return response(['status' => false, 'message' => 'File is not exist'], 404);	
+	}
+
+	public function getAll (Request $request)
+	{
+		$user_id = $request->user()->id;
+
+		$uploaded = File::where([
+						['user_id', '=', $user_id], 
+						['status_id', '=', 1]])
+					->get();
+		
+		$running = File::where([
+						['user_id', '=', $user_id], 
+						['status_id', '=', 2]])
+					->get();
+
+		$finished = File::where([
+						['user_id', '=', $user_id], 
+						['status_id', '=', 3]])
+					->get();
+		
+		$error = File::where([
+						['user_id', '=', $user_id], 
+						['status_id', '=', 4]])
+					->get();
+
+		return [
+			'data' => [
+					'uploaded' => $uploaded,
+					'running' => $running,
+					'finished' => $finished,
+					'error' => $error
+				]
+			];
+		
+	}
+
     public function upload (Request $request)
     {
     	/* 	SECURITY CONCERN:
@@ -68,8 +124,7 @@ class SubmissionController extends Controller
 
 
     	DB::beginTransaction();
-    	try
-    	{
+    	try {
 			// Insert data
 			$file = new File();
 			$file->user_id = $request->user()->id;
@@ -85,13 +140,10 @@ class SubmissionController extends Controller
 			// Generate HashID and create new directory path
     		$hashid = $this->hashId($file->id, "encode");
     		$path = base_path('resources/data/'.$hashid);
-    		if (mkdir($path))
-    		{
+    		if (mkdir($path)) {
 	    		$snps->move($path, $snps_file);
 	    		$phenotype->move($path, $phenotype_file);
-	    	}
-	    	else 
-	    	{
+	    	} else {
 	    		throw new \Exception('Directory creation failed!');
 	    	}
 
@@ -101,12 +153,68 @@ class SubmissionController extends Controller
     		]);
 
     		DB::commit();
-    		return ['status' => true, 'message' => 'Success uploading data'];
-    	}
-    	catch (\Exception $e)
-    	{
+    		return response(['status' => true, 'message' => 'Success uploading data'], 200);
+    	} catch (\Exception $e) {
     		DB::rollback();
-    		return ['status' => false, 'message' => $e->getMessage()];
+    		return response(['status' => false, 'message' => $e->getMessage()], 500);
     	}
-    }
+	}
+
+	public function runAnalysis (Request $request) 
+	{
+		$file_id = $request->file_id;
+
+		$id = $this->hashId($file_id, "decode");
+		if (!$id) {
+			return response(['status' => false, 'message' => 'File is not exist'], 404);
+		} 
+		$file = File::where('id', $id[0])->first();
+
+		$os = php_uname('s');
+		$script_path = base_path('resources/codes/dani.R');
+		$output_path = base_path('resources/data/'.$file_id);
+		$descriptorspec = [  
+			0 => ["pipe", "r"],  
+			1 => ["pipe", "w"],  
+		];  
+
+		if ($os === "Windows NT") {
+			// Preparing the command
+			$Rscript = "C:/PROGRA~1/R/R-3.3.1/bin/x64/Rscript.EXE";
+			$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt";
+			
+			if(is_resource($prog = proc_open("start /B ". $cmd, $descriptorspec, $pipes))) {
+				// Get Parent process Id  
+				$ppid = proc_get_status($prog);  
+				$pid = $ppid['pid']; 
+							
+				// Get PID
+				$output = array_filter(explode(" ", shell_exec("wmic process get parentprocessid,processid | find \"$pid\"")));  
+				array_pop($output);    
+				$pid = end($output);
+			} else {
+				return response(['status' => false, 'message' => 'Failed to execute'], 500);
+			}
+		} else if ($os === "Linux") {
+			$Rscript = "/usr/bin/Rscript";
+			$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt &";
+
+			if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
+				//Get Parent process Id   
+				$ppid = proc_get_status($prog);  
+				$pid = $ppid['pid'];  
+				
+				//Get PID 
+				$pid = $pid+1;  
+			} else {
+				return response(['status' => false, 'message' => 'Failed to execute'], 500);
+			}
+		} else {
+			return response(['status' => false, 'message' => 'Unsupported OS'], 422);
+		}
+
+		echo $pid;
+		// TO DO
+		// Update database change status_id into 2 & insert PID
+	}
 }

@@ -415,26 +415,28 @@ select <- function(x, y, n.tree = 500,
 }
 ##################################################################
 # Main
-# library("optparse")
-#  
-# option_list = list(
-#     make_option(c("-s", "--snp"), type="character", default=NULL, 
-#               help="SNPs dataset", metavar="character"),
-#     make_option(c("-p", "--phenotype"), type="character", 
-#               help="Phenotype measurement dataset", metavar="character")
-#     make_option(c("-a", "--associd"), type="character", 
-#               help="UUID of the two files", metavar="character")      
-# ); 
-#  
-# opt_parser = OptionParser(option_list=option_list);
-# opt = parse_args(opt_parser);
+library("optparse")
+ 
+option_list = list(
+    make_option(c("-s", "--snp"), type="character", default=NULL, 
+              help="SNPs dataset", metavar="character"),
+    make_option(c("-p", "--phenotype"), type="character", 
+              help="Phenotype measurement dataset", metavar="character"),
+    make_option(c("-a", "--associd"), type="character", 
+              help="UUID of the two files", metavar="character")      
+); 
+ 
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
 
 if(.Platform$OS.type == "windows"){
   R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
-  setwd("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data"); #windows
+  workdir <- paste0("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data/", opt$associd)
+  setwd(workdir)
 }else if(.Platform$OS.type == "unix"){
   R.lib.loc <- "/home/biofarmaka/R/x86_64-pc-linux-gnu-library/3.4"
-  setwd("/home/biofarmaka/spacio-codes/data") 
+  workdir <- paste0("/home/biofarmaka/spacio-codes/data/", opt$associd)
+  setwd(workdir) 
 }else{
   stop(message("\n[x] Error: Unknown OS Type!"))
 }
@@ -442,8 +444,8 @@ if(.Platform$OS.type == "windows"){
 debug.mode <- FALSE
 
 cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tPreparing data\n")
-snps <- read.csv('snps_data.csv', header = FALSE, sep = ",")
-phenotype <- read.csv('pheno_data.csv', header = FALSE, sep = ",")
+snps <- read.csv(opt$snp, header = FALSE, sep = ",")
+phenotype <- read.csv(opt$phenotype, header = FALSE, sep = ",")
 
 cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\tPreprocessing Data\n")
 # Reformatting data

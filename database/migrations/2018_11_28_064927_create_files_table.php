@@ -23,6 +23,7 @@ class CreateFilesTable extends Migration
             $table->string('phenotype_data');
             $table->string('configuration');
             $table->integer('status_id')->unsigned();
+            $table->string('pid')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

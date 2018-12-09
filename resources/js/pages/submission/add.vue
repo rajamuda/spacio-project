@@ -1,6 +1,9 @@
 <template>
   <card>
     <div class="m-auto p-4">
+      <div ref="error-message">
+        <div v-if="errors != ''" class="alert alert-danger"><fa icon="times-circle" fixed-width/> {{ errors.message }}</div>
+      </div>
       <div class="form-group row">
         <label class="col-md-3 col-form-label">{{ $t('submission_name') }}</label>
         <input type="text" v-model="project_name" name="project_name" class="col-md-8 form-control">
@@ -109,7 +112,12 @@ export default {
   }),
 
   methods: {
-    getFileSize(type) {
+    goToError () {
+      let el = this.$refs['error-message']
+      window.scrollTo(0, el.offsetTop)
+    },
+    
+    getFileSize (type) {
       let size = 0
       if(type === 'snps' && this.snps.length)
         size = this.snps[0].size/(1024*1024)
@@ -119,7 +127,7 @@ export default {
       return size.toFixed(2)
     },
 
-    prepareFields() {
+    prepareFields () {
       if(this.snps.length && this.phenotype.length && this.project_name && this.organism){
         this.form_data.append('snps', this.snps[0])
         this.form_data.append('phenotype', this.phenotype[0])
@@ -132,7 +140,7 @@ export default {
     },
 
     // This function will be called every time you add a file
-    uploadFieldChange(e, type) {
+    uploadFieldChange (e, type) {
       var file = e.target.files || e.dataTransfer.files
       if (!file.length) return
 
@@ -146,7 +154,7 @@ export default {
       else return
     },
 
-    submit() {
+    submit () {
       if(this.prepareFields() && !this.uploaded){
         this.errors = ''
         this.uploaded = true
@@ -162,22 +170,27 @@ export default {
         axios.post('/api/submission/upload', this.form_data, config)
           .then(({data}) => {
             console.log(data)
-          }).catch((e) => {
+          }).catch((error) => {
+            console.error(error.response)
             this.uploaded = false
-            this.percent_completed = 0;
-            console.error(e)
+            this.errors = error.response.data
+            this.goToError()
           });
       } else {
-        this.errors = "Specified field or file not inputed yet"
+        this.errors = { message: "Specified field or file not inputed yet" }
+        this.goToError()     
       }
     },
 
     // We want to clear the FormData object on every upload so we can re-calculate new files again.
     // Keep in mind that we can delete files as well so in the future we will need to keep track of that as well
-    resetData() {
+    resetData () {
       this.form_data = new FormData() // Reset it completely
       this.snps = []
       this.phenotype = []
+      this.percent_completed = 0
+      this.uploaded = false
+      this.errors = ''
     },
   }
 }
