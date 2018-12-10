@@ -435,7 +435,7 @@ if(.Platform$OS.type == "windows"){
   setwd(workdir)
 }else if(.Platform$OS.type == "unix"){
   R.lib.loc <- "/home/biofarmaka/R/x86_64-pc-linux-gnu-library/3.4"
-  workdir <- paste0("/home/biofarmaka/spacio-codes/data/", opt$associd)
+  workdir <- paste0("/home/biofarmaka/surado/spacio-project/resources/data/", opt$associd)
   setwd(workdir) 
 }else{
   stop(message("\n[x] Error: Unknown OS Type!"))
