@@ -522,8 +522,10 @@ cat("############################################################\n")
 selection.result <- select(data.geno, as.numeric(data.pheno), set.mtry = "complete")
 
 # write result into CSV and JSON files
-df <- data.frame(cbind(selection.result$final.selected.var, selection.result$final.selected.index))
-colnames(df) <- c("selected", "rank")
+df <- data.frame(cbind(selection.result$final.selected.index))
+rownames(df) <- selection.result$final.selected.var
+df <- merge(df, t(snps.pos), by = 0)
+colnames(df) <- c("selected", "rank", "chr", "pos")
 write.csv(df, file="result.csv", row.names = FALSE)
-write(paste0("{\"adjR2\": \"", selection.result$final.adjR2, "\", \"mse\": \"", selection.result$final.mse, "\"}")
+write(paste0("{\"phenotype\": \"", phenotype.col$V2, "\", \"adjR2\": \"", selection.result$final.adjR2, "\", \"mse\": \"", selection.result$final.mse, "\"}")
       , file="metrics.json")

@@ -91,7 +91,7 @@
         <div v-for="(data, index) in finished" :key="index">
           <div class="card border-custom mb-3 mt-2">	
             <router-link :to="{ name: 'submission.result', params: { hash_id: data.hashid }}">
-              <div class="card-header text-white bg-custom">{{ data.project_name }} ( {{ data.process_status.name }} )</div>
+              <div class="card-header text-white bg-custom">{{ data.project_name }} ({{ data.process_status.name }})</div>
             </router-link>
             <div class="card-body text-dark">
               <div class="process-status">

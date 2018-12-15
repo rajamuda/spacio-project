@@ -36,7 +36,27 @@ class SubmissionController extends Controller
 	
 	private static function parseCsv ($csv)
 	{
+		$data = @file_get_contents($csv);
+		if ($data) {
+			$data = explode("\n", $data);
+			array_pop($data);
+			array_shift($data);
+			$result = [];
 
+			foreach ($data as $d) {
+				$tmp = explode(",", $d);
+				$result[] = [
+					"snp" => self::fileNameFilter($tmp[0]),
+					"rank" => self::fileNameFilter($tmp[1]),
+					"chr" => self::fileNameFilter($tmp[2]),
+					"pos" => self::fileNameFilter($tmp[3]),
+				];
+			}
+
+			return $result;
+		}
+
+		return null;
 	}
 
     /*
@@ -64,13 +84,13 @@ class SubmissionController extends Controller
 			if($file){
 				// Read log.txt, error.txt, result.csv, and metrics.json
 				$file_dir = base_path('resources/data/'.$file->hashid);
-
 				// if file is not exist, simply null or false it (that is why I used '@')
 				$log = @file_get_contents($file_dir."/log.txt");
 				$error = @file_get_contents($file_dir."/error.txt");
 				$metrics = json_decode(@file_get_contents($file_dir."/metrics.json"));
-
-				return ['file' => $file, 'log' => $log, 'error' => $error, 'metrics' => $metrics];
+				$result = $this->parseCsv($file_dir."/result.csv");
+				
+				return ['file' => $file, 'log' => $log, 'error' => $error, 'metrics' => $metrics, 'result' => $result];
 			}
 		}
 
@@ -94,6 +114,7 @@ class SubmissionController extends Controller
 		$finished = File::with('processStatus')->where([
 						['user_id', '=', $user_id]])
 						->whereIn('status_id', [3, 4])
+						->orderBy('created_at')
 					->get();
 
 		return [
@@ -146,7 +167,7 @@ class SubmissionController extends Controller
 			// Generate HashID and create new directory path
     		$hashid = $this->hashId($file->id, "encode");
     		$path = base_path('resources/data/'.$hashid);
-    		if (mkdir($path)) {
+    		if (@mkdir($path)) {
 	    		$snps->move($path, $snps_file);
 	    		$phenotype->move($path, $phenotype_file);
 	    	} else {
