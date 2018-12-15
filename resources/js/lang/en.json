@@ -45,5 +45,14 @@
   "size": "Size",
   "upload": "Upload",
   "begin_analysis": "Begin Association Analysis",
-  "choose_file": "Choose a file"
+  "choose_file": "Choose a file",
+  "status": "Status",
+  "uploaded_date": "Uploaded date",
+  "running_date": "Start time",
+  "running": "running...",
+  "uploaded_status": "Ready to analysis",
+  "running_status": "Currently running",
+  "finished_status": "Completed analysis",
+  "error_status": "Incomplete analysis (error occured)",
+  "no_file": "No file uploaded."
 }

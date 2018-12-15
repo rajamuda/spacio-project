@@ -228,9 +228,21 @@ return [
     */
 
     'hashid' => [
-        'secret' => env('HASHID_KEY'),
+        'secret' => env('HASHID_KEY', "this-is-secret"),
         'padding' => '10',
         'characters' => 'abcdefghijklmnopqrstuvwxyz0123456789',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rscript executable file location
+    |--------------------------------------------------------------------------
+    |
+    | Locate the Rscript executable file that will be used to run 
+    | association analysis process. Default is using Rscript location in Linux.
+    | 
+    */
+    'rscript' => env('RSCRIPT_DIR', '/usr/bin/Rscript'),
+    'rlib' => "To Do",
 
 ];

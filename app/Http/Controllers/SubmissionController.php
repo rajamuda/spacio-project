@@ -32,7 +32,12 @@ class SubmissionController extends Controller
 			return $hashid->encode($id);
 		else if($type === "decode")
 			return $hashid->decode($id);
-    }
+	}
+	
+	private static function parseCsv ($csv)
+	{
+
+	}
 
     /*
     |--------------------------------------------------------------------------
@@ -51,16 +56,23 @@ class SubmissionController extends Controller
 		$id = $this->hashId($request->hash_id, "decode");
 		
 		if($id){
-			$file = File::where([
+			$file = File::with('processStatus')->where([
 						['user_id', '=', $user_id],
 						['id', '=', $id[0]]
 					])->first();
 			
-			return $file;
-		}
+			if($file){
+				// Read log.txt, error.txt, result.csv, and metrics.json
+				$file_dir = base_path('resources/data/'.$file->hashid);
 
-		// TO DO
-		// Read log.txt, error.txt, result.csv, and metrics.json
+				// if file is not exist, simply null or false it (that is why I used '@')
+				$log = @file_get_contents($file_dir."/log.txt");
+				$error = @file_get_contents($file_dir."/error.txt");
+				$metrics = json_decode(@file_get_contents($file_dir."/metrics.json"));
+
+				return ['file' => $file, 'log' => $log, 'error' => $error, 'metrics' => $metrics];
+			}
+		}
 
 		return response(['status' => false, 'message' => 'File is not exist'], 404);	
 	}
@@ -69,28 +81,28 @@ class SubmissionController extends Controller
 	{
 		$user_id = $request->user()->id;
 
-		$uploaded = File::where([
+		$uploaded = File::with('processStatus')->where([
 						['user_id', '=', $user_id], 
 						['status_id', '=', 1]])
 					->get();
 		
-		$running = File::where([
+		$running = File::with('processStatus')->where([
 						['user_id', '=', $user_id], 
 						['status_id', '=', 2]])
 					->get();
 
-		$finished = File::where([
+		$finished = File::with('processStatus')->where([
 						['user_id', '=', $user_id], 
 						['status_id', '=', 3]])
 					->get();
 		
-		$error = File::where([
+		$error = File::with('processStatus')->where([
 						['user_id', '=', $user_id], 
 						['status_id', '=', 4]])
 					->get();
 
 		return [
-			'data' => [
+			'file' => [
 					'uploaded' => $uploaded,
 					'running' => $running,
 					'finished' => $finished,
@@ -153,7 +165,7 @@ class SubmissionController extends Controller
     		]);
 
     		DB::commit();
-    		return response(['status' => true, 'message' => 'Success uploading data'], 200);
+    		return response(['status' => true, 'message' => 'Success uploading data', 'hashid' => $hashid], 200);
     	} catch (\Exception $e) {
     		DB::rollback();
     		return response(['status' => false, 'message' => $e->getMessage()], 500);
@@ -169,7 +181,10 @@ class SubmissionController extends Controller
 			return response(['status' => false, 'message' => 'File is not exist'], 404);
 		} 
 		$file = File::where('id', $id[0])->first();
-
+		if($file->status_id > 1) {
+			return response(['status' => false, 'message' => 'Process already running or finished'], 422);
+		}
+		
 		$os = php_uname('s');
 		$script_path = base_path('resources/codes/dani.R');
 		$output_path = base_path('resources/data/'.$file_id);
@@ -178,11 +193,11 @@ class SubmissionController extends Controller
 			1 => ["pipe", "w"],  
 		];  
 
-		if ($os === "Windows NT") {
-			// Preparing the command
-			$Rscript = "C:/PROGRA~1/R/R-3.3.1/bin/x64/Rscript.EXE";
-			$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt";
+		//Preparing the command
+		$Rscript = config('app.rscript');
+		$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt";
 			
+		if ($os === "Windows NT") {
 			if(is_resource($prog = proc_open("start /B ". $cmd, $descriptorspec, $pipes))) {
 				// Get Parent process Id  
 				$ppid = proc_get_status($prog);  
@@ -196,9 +211,7 @@ class SubmissionController extends Controller
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else if ($os === "Linux") {
-			$Rscript = "/usr/bin/Rscript";
-			$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt &";
-
+			// $cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt &";
 			if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
 				//Get Parent process Id   
 				$ppid = proc_get_status($prog);  
@@ -213,8 +226,11 @@ class SubmissionController extends Controller
 			return response(['status' => false, 'message' => 'Unsupported OS'], 422);
 		}
 
-		echo $pid;
-		// TO DO
-		// Update database change status_id into 2 & insert PID
+		// Update File table: 
+		// -- change status_id into 2 (performing analysis)
+		// -- insert PID of current process
+		$file->pid = $pid;
+		$file->status_id = 2;
+		$file->save();
 	}
 }

@@ -26,7 +26,7 @@ class File extends Model
     /**
      * @var array
      */
-    protected $fillable = ['user_id', 'status_id', 'hashid', 'project_name', 'organism', 'snps_data', 'phenotype_data', 'configuration', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'status_id', 'hashid', 'project_name', 'organism', 'snps_data', 'phenotype_data', 'configuration', 'pid', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

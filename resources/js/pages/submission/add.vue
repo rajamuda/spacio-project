@@ -46,14 +46,13 @@
       </div>
       <!-- Parameter settings -->
       <div id="accordion">
-
-          <div id="headingOne">
-            <h5 class="mb-0">
-              <button class="p-0 btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                <fa icon="caret-square-down" fixed-width/> {{ $t('advanced_settings') }}
-              </button>
-            </h5>
-          </div>
+        <div id="headingOne">
+          <h5 class="mb-0">
+            <button class="p-0 btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <fa icon="caret-square-down" fixed-width/> {{ $t('advanced_settings') }}
+            </button>
+          </h5>
+        </div>
         <div class="px-2">
           <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
             <div class="row mx-auto">
@@ -77,7 +76,7 @@
       </div>
       <div class="form-group pt-4 px-0 col-md-12">
         <button class="btn btn-success" :disabled="uploaded" @click="submit"><fa icon="upload" fixed-width/> {{ $t('upload') }}</button>
-        <button class="btn" :class="{'btn-secondary': (percent_completed < 100), 'btn-primary': (percent_completed == 100)}" :disabled="percent_completed < 100"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
+        <button class="btn" :class="{'btn-secondary': (percent_completed < 100), 'btn-primary': (percent_completed == 100)}" @click="beginAnalysis()" :disabled="percent_completed < 100"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
       </div>   
     </div>
   </card>
@@ -104,7 +103,8 @@ export default {
     form_data: new FormData(),
     errors: '',
     percent_completed: 0,
-    uploaded: false
+    uploaded: false,
+    upload_hash: '',
   }),
 
   computed: mapGetters({
@@ -170,16 +170,30 @@ export default {
         axios.post('/api/submission/upload', this.form_data, config)
           .then(({data}) => {
             console.log(data)
+            this.upload_hash = data.hashid
           }).catch((error) => {
             console.error(error.response)
             this.uploaded = false
             this.errors = error.response.data
             this.goToError()
-          });
+          })
       } else {
         this.errors = { message: "Specified field or file not inputed yet" }
         this.goToError()     
       }
+    },
+
+    beginAnalysis () {
+      this.errors = ""
+      axios.post('/api/submission/run-analysis', { file_id: this.upload_hash })
+        .then(({data}) => {
+          console.log(data)
+          this.$router.push({ name: 'submission.result', params: { hash_id: this.upload_hash } })
+        }).catch((error) => {
+          console.error(error.response)
+          this.errors = error.response.data
+          this.goToError()
+        })
     },
 
     // We want to clear the FormData object on every upload so we can re-calculate new files again.

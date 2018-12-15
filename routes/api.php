@@ -49,9 +49,9 @@ Route::group(['middleware' => 'guest:api'], function () {
                     config('app.hashid.padding'), 
                     config('app.hashid.characters')
                 );
-        // $enc = $hashid->encode($id);
-        $dec = $hashid->decode($id);
-        print_r($dec);
+        $enc = $hashid->encode($id);
+        // $dec = $hashid->decode($id);
+        print_r($enc);
 
         // echo $enc."<br/>\n";
         // echo $dec[0]."\n";
