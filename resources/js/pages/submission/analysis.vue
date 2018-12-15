@@ -7,7 +7,7 @@
       </vue-content-loading>
     </div>
     <div v-else>
-      <div class="text-center" v-if="!running.length && !uploaded.length && !finished.length && !error.length">
+      <div class="text-center" v-if="!running.length && !uploaded.length && !finished.length">
         {{ $t('no_file') }}<br/>
         <router-link :to="{ name: 'submission.add' }">Add new file</router-link>
       </div>
@@ -149,7 +149,6 @@ export default {
     uploaded: [],
     running: [],
     finished: [],
-    error: [],
     is_load: true,
   }),
 
@@ -168,7 +167,6 @@ export default {
         this.uploaded = data.file.uploaded
         this.running = data.file.running
         this.finished = data.file.finished
-        this.error = data.file.error
         this.is_load = false
       } catch (error) {
         console.error(error)
