@@ -91,7 +91,7 @@
         <div v-for="(data, index) in finished" :key="index">
           <div class="card border-custom mb-3 mt-2">	
             <router-link :to="{ name: 'submission.result', params: { hash_id: data.hashid }}">
-              <div class="card-header text-white bg-custom">{{ data.project_name }}</div>
+              <div class="card-header text-white bg-custom">{{ data.project_name }} ( {{ data.process_status.name }} )</div>
             </router-link>
             <div class="card-body text-dark">
               <div class="process-status">
@@ -112,9 +112,9 @@
                     <td>{{ data.phenotype_data }}</td>
                   </tr>
                   <tr>
-                    <td>{{ $t('uploaded_date') }}</td>
+                    <td>{{ $t('finished_date') }}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.created_at }}</td>
+                    <td>{{ data.updated_at }}</td>
                   </tr>
                 </table>
               </div>

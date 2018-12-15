@@ -92,21 +92,15 @@ class SubmissionController extends Controller
 					->get();
 
 		$finished = File::with('processStatus')->where([
-						['user_id', '=', $user_id], 
-						['status_id', '=', 3]])
-					->get();
-		
-		$error = File::with('processStatus')->where([
-						['user_id', '=', $user_id], 
-						['status_id', '=', 4]])
+						['user_id', '=', $user_id]])
+						->whereIn('status_id', [3, 4])
 					->get();
 
 		return [
 			'file' => [
 					'uploaded' => $uploaded,
 					'running' => $running,
-					'finished' => $finished,
-					'error' => $error
+					'finished' => $finished
 				]
 			];
 		
@@ -184,7 +178,7 @@ class SubmissionController extends Controller
 		if($file->status_id > 1) {
 			return response(['status' => false, 'message' => 'Process already running or finished'], 422);
 		}
-		
+
 		$os = php_uname('s');
 		$script_path = base_path('resources/codes/dani.R');
 		$output_path = base_path('resources/data/'.$file_id);

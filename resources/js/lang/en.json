@@ -49,6 +49,7 @@
   "status": "Status",
   "uploaded_date": "Uploaded date",
   "running_date": "Start time",
+  "finished_date": "Finished date",
   "running": "running...",
   "uploaded_status": "Ready to analysis",
   "running_status": "Currently running",
