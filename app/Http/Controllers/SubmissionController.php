@@ -114,7 +114,7 @@ class SubmissionController extends Controller
 		$finished = File::with('processStatus')->where([
 						['user_id', '=', $user_id]])
 						->whereIn('status_id', [3, 4])
-						->orderBy('created_at')
+						->orderBy('created_at', 'DESC')
 					->get();
 
 		return [
@@ -200,6 +200,7 @@ class SubmissionController extends Controller
 			return response(['status' => false, 'message' => 'Process already running or finished'], 422);
 		}
 
+		// preparing
 		$os = php_uname('s');
 		$script_path = base_path('resources/codes/dani.R');
 		$output_path = base_path('resources/data/'.$file_id);
@@ -211,7 +212,10 @@ class SubmissionController extends Controller
 		//Preparing the command
 		$Rscript = config('app.rscript');
 		$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt";
-			
+		
+		/*
+			Codes below are based on https://www.c-sharpcorner.com/code/30/how-to-invokestart-a-process-in-php-and-kill-it-using-process-id.aspx
+		*/
 		if ($os === "Windows NT") {
 			if(is_resource($prog = proc_open("start /B ". $cmd, $descriptorspec, $pipes))) {
 				// Get Parent process Id  
@@ -246,6 +250,7 @@ class SubmissionController extends Controller
 		// -- insert PID of current process
 		$file->pid = $pid;
 		$file->status_id = 2;
+		$file->updated_at = date("Y-m-d H:i:s");
 		$file->save();
 	}
 }

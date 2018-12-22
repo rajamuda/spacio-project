@@ -50,7 +50,9 @@
             <td>{{ result.file.updated_at }}</td>
           </tr>
         </table>
-        <!-- TO DO: add begin analysis button if status_id = 1, and stop button if status_id = 2 -->
+        <div v-if="result.file.status_id === 1" class="text-center p-2">
+          <button class="btn btn-success" @click="beginAnalysis(hash_id)"><fa icon="play" fixed-width/> {{ $t('begin_analysis') }}</button>
+        </div>
       </div>
       <div v-if="result.file.status_id === 3" id="process-result" class="pb-2">
         <h5 class="p-0 btn btn-link btn-lg btn-block text-left" data-toggle="collapse" href="#result" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -179,6 +181,16 @@ export default {
 
     toPercent (val) {
       return Number(val).toFixed(2)*100+"%"
+    },
+
+    beginAnalysis (hashid) {
+      axios.post('/api/submission/run-analysis', { file_id: hashid })
+        .then(({data}) => {
+          console.log(data)
+          this.get(false);
+        }).catch((error) => {
+          console.error(error.response)
+        })
     }
   }
 }
@@ -188,8 +200,8 @@ export default {
   background-color: #efefef;
 }
 .result {
-  border: solid 1px #343A40;
-  border-radius: 0.1em;
+  border: solid 1px rgba(52,58,64,0.5);
+  border-radius: 0.25em;
   padding: 0.5em;
 }
 
