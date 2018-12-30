@@ -80,11 +80,17 @@ class checkRunningAnalysis extends Command
         $error_file = @file_get_contents($dir."/error.txt");
         $metrics = json_decode(@file_get_contents($dir."/metrics.json"));
         
-        if ($error_file && !$metrics) {
-            return true;
+        /* 
+        | No error is when error.txt file is empty or metrics.json file is not empty (process finished successfully)
+        | this indicate that process may have problems while running
+        | or the files specified by user can not be processed by program 
+        */
+        
+        if ($metrics) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public function updateProcess ($file_id, $status_id) {

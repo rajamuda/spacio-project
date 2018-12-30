@@ -27,12 +27,12 @@
           <tr>
             <td>{{ $t('snp_data' )}}</td>
             <td class="colon">:&nbsp;&nbsp;</td>
-            <td>{{ result.file.snps_data }}</td>
+            <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+hash_id+'/'+result.file.snps_data" _target="blank" title="Click to download file">{{ result.file.snps_data }}</a></td>
           </tr>
           <tr>
             <td>{{ $t('phenotype_data' )}}</td>
             <td class="colon">:&nbsp;&nbsp;</td>
-            <td>{{ result.file.phenotype_data }}</td>
+            <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+hash_id+'/'+result.file.phenotype_data" _target="blank" title="Click to download file">{{ result.file.phenotype_data }}</a></td>
           </tr>
           <tr v-if="result.file.status_id === 1"> <!-- uploaded -->
             <td>{{ $t('running_date') }}</td>
@@ -149,7 +149,7 @@ export default {
         const { data } = await axios.get('/api/submission/get/'+this.hash_id)
         this.result = data
         this.is_load = false
-  // concern: Timezone, time elapsed better handle by server instead of client
+
         if (!refresh && this.result.file.status_id == 2) {
           this.timeDiff()
           this.time_ticker = setInterval(this.timeDiff, 1000)
@@ -164,6 +164,7 @@ export default {
     },
 
     timeDiff () {
+      // const { data } = await axios.get('/api/server-time')
       let curr_time = new Date()
       let past_time = new Date(this.result.file.updated_at)
 

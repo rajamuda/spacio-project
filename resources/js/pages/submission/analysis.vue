@@ -29,12 +29,12 @@
                   <tr>
                     <td>{{ $t('snp_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.snps_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.snps_data" _target="blank" title="Click to download file">{{ data.snps_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('phenotype_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.phenotype_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.phenotype_data" _target="blank" title="Click to download file">{{ data.phenotype_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('running_date') }}</td>
@@ -65,12 +65,12 @@
                   <tr>
                     <td>{{ $t('snp_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.snps_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.snps_data" _target="blank" title="Click to download file">{{ data.snps_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('phenotype_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.phenotype_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.phenotype_data" _target="blank" title="Click to download file">{{ data.phenotype_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('uploaded_date') }}</td>
@@ -104,12 +104,12 @@
                   <tr>
                     <td>{{ $t('snp_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.snps_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.snps_data" _target="blank" title="Click to download file">{{ data.snps_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('phenotype_data' )}}</td>
                     <td class="colon">:&nbsp;&nbsp;</td>
-                    <td>{{ data.phenotype_data }}</td>
+                    <td><fa icon="file-csv" width="sm"></fa> <a :href="'/file/file-'+data.hashid+'/'+data.phenotype_data" _target="blank" title="Click to download file">{{ data.phenotype_data }}</a></td>
                   </tr>
                   <tr>
                     <td>{{ $t('finished_date') }}</td>

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use Hashids\Hashids; // <- using PHP BC Math extension
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +12,14 @@ use Hashids\Hashids; // <- using PHP BC Math extension
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/testapi', function (Request $request) {
+    return str_replace("\\", "/", base_path());
+});
+
+Route::get('/server-time', function (Request $request) {
+    return date("Y-m-d H:i:s");
+});
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');
@@ -40,27 +47,4 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     Route::post('oauth/{driver}', 'Auth\OAuthController@redirectToProvider');
     Route::get('oauth/{driver}/callback', 'Auth\OAuthController@handleProviderCallback')->name('oauth.callback');
-
-    Route::get('test/hashid', function (Request $request) {
-        $id = $request->query('id');
-
-        $hashid = new Hashids(
-                    config('app.hashid.secret'), 
-                    config('app.hashid.padding'), 
-                    config('app.hashid.characters')
-                );
-        $enc = $hashid->encode($id);
-        // $dec = $hashid->decode($id);
-        print_r($enc);
-
-        // echo $enc."<br/>\n";
-        // echo $dec[0]."\n";
-        // $file = "/home/surado/htdocs/spacio-project/resources/data/result.csv";
-        // $csv= file_get_contents($file);
-        // $array = array_map("str_getcsv", explode("\n", $csv));
-        // $json = json_encode($array);
-        // print_r($array);
-        // $a = "Xy2nasj2";
-        // echo base_path('resources/data/'.$a);
-    });
 });

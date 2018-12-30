@@ -243,6 +243,6 @@ return [
     | 
     */
     'rscript' => env('RSCRIPT_DIR', '/usr/bin/Rscript'),
-    'rlib' => "To Do",
+    'rlib' => env('RLIB_LOC'),
 
 ];

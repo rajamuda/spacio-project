@@ -37,8 +37,9 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
 
-        $this->mapWebRoutes();
+        $this->mapFileRoutes();
 
+        $this->mapWebRoutes();
         //
     }
 
@@ -69,5 +70,20 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    /**
+     * Define the "file" routes for the application.
+     *
+     * These routes handling file processing, e.g. read or downloading file
+     *
+     * @return void
+     */
+    protected function mapFileRoutes()
+    {
+        Route::prefix('file')
+             ->middleware('file')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/file.php'));
     }
 }

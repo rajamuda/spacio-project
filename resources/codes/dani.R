@@ -423,23 +423,30 @@ option_list = list(
     make_option(c("-p", "--phenotype"), type="character", 
               help="Phenotype measurement dataset", metavar="character"),
     make_option(c("-a", "--associd"), type="character", 
-              help="UUID of the two files", metavar="character")      
+              help="UUID of the files", metavar="character"),
+    make_option(c("-w", "--workdir"), type="character", 
+              help="Working directory where the files placed", metavar="character"),
+    make_option(c("-l", "--lib"), type="character", 
+              help="Where all R libraries placed", metavar="character")      
 ); 
  
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
-if(.Platform$OS.type == "windows"){
-  R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
-  workdir <- paste0("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data/", opt$associd)
-  setwd(workdir)
-}else if(.Platform$OS.type == "unix"){
-  R.lib.loc <- "/home/biofarmaka/R/x86_64-pc-linux-gnu-library/3.4"
-  workdir <- paste0("/home/biofarmaka/surado/spacio-project/resources/data/", opt$associd)
-  setwd(workdir) 
-}else{
-  stop(message("\n[x] Error: Unknown OS Type!"))
-}
+# if(.Platform$OS.type == "windows"){
+#   R.lib.loc <- "C:/Users/lenovo/Documents/R/win-library/3.3"
+#   workdir <- paste0("C:/Users/lenovo/Documents/SrdoFiles/spacio-project/resources/data/", opt$associd)
+#   setwd(workdir)
+# }else if(.Platform$OS.type == "unix"){
+#   R.lib.loc <- "/home/biofarmaka/R/x86_64-pc-linux-gnu-library/3.4"
+#   workdir <- paste0("/home/biofarmaka/surado/spacio-project/resources/data/", opt$associd)
+#   setwd(workdir) 
+# }else{
+#   stop(message("\n[x] Error: Unknown OS Type!"))
+# }
+R.lib.loc <- opt$lib
+workdir <- paste0(opt$workdir, opt$associd)
+setwd(workdir)
 
 debug.mode <- FALSE
 

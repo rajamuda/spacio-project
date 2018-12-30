@@ -211,7 +211,10 @@ class SubmissionController extends Controller
 
 		//Preparing the command
 		$Rscript = config('app.rscript');
-		$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt";
+		$Rworkdir = str_replace("\\", "/", base_path('resources/data/'));
+		$Rlib = config('app.rlib');
+
+		$cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid -w $Rworkdir -l $Rlib > $output_path/log.txt 2> $output_path/error.txt";
 		
 		/*
 			Codes below are based on https://www.c-sharpcorner.com/code/30/how-to-invokestart-a-process-in-php-and-kill-it-using-process-id.aspx
@@ -230,8 +233,7 @@ class SubmissionController extends Controller
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else if ($os === "Linux") {
-			// $cmd = "$Rscript $script_path -s $file->snps_data -p $file->phenotype_data -a $file->hashid > $output_path/log.txt 2> $output_path/error.txt &";
-			if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
+			if(is_resource($prog = proc_open("nohup ". $cmd ." &", $descriptorspec, $pipes))) {
 				//Get Parent process Id   
 				$ppid = proc_get_status($prog);  
 				$pid = $ppid['pid'];  
