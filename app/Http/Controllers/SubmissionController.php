@@ -254,5 +254,7 @@ class SubmissionController extends Controller
 		$file->status_id = 2;
 		$file->updated_at = date("Y-m-d H:i:s");
 		$file->save();
+
+		return response(['status' => true, 'message' => 'Process is successfully running ...'], 200);
 	}
 }
