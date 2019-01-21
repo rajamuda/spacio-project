@@ -233,7 +233,7 @@ class SubmissionController extends Controller
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else if ($os === "Linux") {
-			if(is_resource($prog = proc_open("nohup ". $cmd ." &", $descriptorspec, $pipes))) {
+			if(is_resource($prog = proc_open("nohup ". $cmd ." & echo $!", $descriptorspec, $pipes))) {
 				//Get Parent process Id   
 				$ppid = proc_get_status($prog);  
 				$pid = $ppid['pid'];  
