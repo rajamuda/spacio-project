@@ -233,14 +233,16 @@ class SubmissionController extends Controller
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else if ($os === "Linux") {
-			if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
-				//Get Parent process Id   
-				$ppid = proc_get_status($prog);  
-				$pid = $ppid['pid'];  
+			$pid = (int)shell_exec(sprintf('nohup bash -c "%s" </dev/null >/dev/null 2>/dev/null & echo $!', $cmd));
+			if(!$pid) {
+			// if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
+			// 	//Get Parent process Id   
+			// 	$ppid = proc_get_status($prog);  
+			// 	$pid = $ppid['pid'];  
 				
-				//Get PID 
-				$pid = $pid+1;  
-			} else {
+			// 	//Get PID 
+			// 	$pid = $pid+1;  
+			// } else {
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else {
