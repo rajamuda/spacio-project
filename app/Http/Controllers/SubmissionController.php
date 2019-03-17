@@ -233,7 +233,12 @@ class SubmissionController extends Controller
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
 		} else if ($os === "Linux") {
+			if(ob_get_level() == 0) ob_start();
+
 			$pid = (int)shell_exec(sprintf('nohup bash -c "%s" </dev/null >/dev/null 2>/dev/null & echo $!', $cmd));
+			
+			ob_flush();
+			ob_end_flush();
 			if(!$pid) {
 			// if(is_resource($prog = proc_open("nohup ". $cmd, $descriptorspec, $pipes))) {
 			// 	//Get Parent process Id   
@@ -245,6 +250,7 @@ class SubmissionController extends Controller
 			// } else {
 				return response(['status' => false, 'message' => 'Failed to execute'], 500);
 			}
+dd($pid);
 		} else {
 			return response(['status' => false, 'message' => 'Unsupported OS'], 422);
 		}

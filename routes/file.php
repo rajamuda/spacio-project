@@ -13,9 +13,9 @@ Route::group(['middleware' => 'auth:file'], function () {
             $file = File::where([['user_id', '=', $request->user()->id], ['hashid', '=', $request->hashid]])->firstOrFail();
             
             if (substr($request->filename, 0, 4) === "snps") {
-                $file_loc = base_path('resources/data/'.$request->hashid.'/'.$file->snps_data);
+                $file_loc = base_path('/resources/data/'.$request->hashid.'/'.$file->snps_data);
             } else if (substr($request->filename, 0, 5) === "pheno") {
-                $file_loc = base_path('resources/data/'.$request->hashid.'/'.$file->phenotype_data);
+                $file_loc = base_path('/resources/data/'.$request->hashid.'/'.$file->phenotype_data);
             } else {
                 abort(404);
             }

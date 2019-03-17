@@ -1,0 +1,2 @@
+nohup bash -c "php -S 0.0.0.0:5400 /home/biofarmaka/surado/spacio-project/server.php" </dev/null 2>&1 > /dev/null  &
+autossh -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -R spacio:80:localhost:5400 serveo.net
